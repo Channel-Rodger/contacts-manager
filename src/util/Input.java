@@ -31,6 +31,7 @@ public class Input {
     public int getInt(int min, int max){
         System.out.println("Enter an integer from " + min + " to " + max);
         int userInt = scanner.nextInt();
+        scanner.nextLine();
         if(userInt < min || userInt > max){
            return getInt(min,max);
         }else {

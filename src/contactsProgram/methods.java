@@ -19,10 +19,17 @@ public class methods {
     public static void mainMenu() {
         System.out.println("1. View Contacts");
         System.out.println("2. Add a new Contact");
-        System.out.println("3. Search a contact by name");
-        System.out.println("4. Delete an existing contact");
-        System.out.println("5. Add series of contacts");
-        System.out.println("6. Exit");
+        System.out.println("3. Edit a contact by name");
+        System.out.println("4. Search for a contact");
+        System.out.println("5. Delete an existing contact");
+        System.out.println("6. Add series of contacts");
+        System.out.println("7. Exit");
+    }
+
+    public static void editMenu() {
+        System.out.println("1. Edit Name");
+        System.out.println("2. Edit Phone Number");
+        System.out.println("3. Edit Name and Phone Number");
     }
 
     public static List<String> slurp() {
@@ -67,19 +74,29 @@ public class methods {
         }
     }
 
-
-    public static void addContact() {
-        List<String> newEntry = new ArrayList<>();
+    public static String addValidName() {
         String name =ask.getString("Enter your name: (First Last)");
         while (checkName(name)){
             System.out.println("Names can only contain letters");
             name = ask.getString("Enter your name: (First Last)");
         }
+        return name;
+    }
+
+    public static Long addValidNumber() {
         Long num = ask.getLong("Enter your phone number: ");
         while(checkNumber(num.toString())){
             System.out.println("Phone number must be either 7 or 10 digits");
             num = ask.getLong("Enter your phone number: ");
         }
+        return num;
+    }
+
+
+    public static void addContact() {
+        List<String> newEntry = new ArrayList<>();
+        String name =addValidName();
+        Long num = addValidNumber();
         String entry =  name.toLowerCase() + " #" + num ;
         newEntry.add(entry);
             overwrite(newEntry, true);
@@ -88,31 +105,77 @@ public class methods {
         }
     }
 
-    public static void searchContacts() {
-        String name = ask.getString("What name do you want to find?: ");
+    public static List<String> searchContacts(String prompt) {
+        String name = ask.getString(prompt);
         List<String> results = new ArrayList<>();
         for (String contact : slurp()) {
             if (contact.contains(name)) {
                 results.add(contact);
             }
         }
-        printContacts(results);
+        return results;
     }
 
-    public static void deleteContact(boolean edit) {
-        String name = ask.getString("What name would you like to remove?: ");
+    public static void deleteContact() {
+        String name = ask.getString("What name would you like to remove?");
         List<String> results = new ArrayList<>();
         for (String contact : slurp()) {
             if (!contact.contains(name)) {
                 results.add(contact);
-            }else{
-                if(edit){
-                    "Whats the new name or number"
-                            results.add(name + number)
-                }
             }
-        }        overwrite(results, false);
+        }
+        overwrite(results, false);
+    }
 
+    public static List<String> editSearch(String name) {
+        List<String> results = new ArrayList<>();
+        for (String contact : slurp()) {
+            if (contact.contains(name)) {
+                results.add(contact);
+            }
+        }
+        return results;
+    }
+
+    public static void editContact() {
+        String name = ask.getString("What name would you like to edit?");
+        List<String> results = editSearch(name);
+        if (results.size() > 1) {
+            printContacts(results);
+            System.out.println("Please specify which contact you would like to edit.");
+            editContact();
+            return;
+        }
+        List<String> addressBook = new ArrayList<>();
+        for (String contact : slurp()) {
+            if (!contact.contains(name)) {
+                addressBook.add(contact);
+            } else {
+
+                if (results.size() == 1) {
+                    String oldName = contact.substring(0, contact.indexOf("#"));
+                    String number = contact.substring(contact.indexOf("#") + 1);
+                    editMenu();
+                    int userChoice = ask.getInt(1,3);
+                    if (userChoice == 1) {
+                       oldName = addValidName();
+                       addressBook.add(oldName + " #" + number);
+                    }
+                    if (userChoice == 2) {
+                        Long num = addValidNumber();
+                        addressBook.add(oldName + " #" + num);
+                    }
+                    if (userChoice == 3) {
+                        oldName = addValidName();
+                        Long num = addValidNumber();
+                        addressBook.add(oldName + " #" + num);
+                    }
+
+                }
+
+                    }
+        }
+        overwrite(addressBook, false);
     }
 
     public static void overwrite(List<String> list, boolean append) {

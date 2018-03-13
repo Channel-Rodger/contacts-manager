@@ -9,7 +9,7 @@ public class main {
         Input ask = new Input();
 
         int choice = 0;
-        while (choice != 6) {
+        while (choice != 7) {
 
             if(choice == 1) {
                 methods.viewContacts();
@@ -17,13 +17,17 @@ public class main {
             if(choice == 2) {
                 methods.addContact();
             }
-            if(choice == 3) {
-                methods.searchContacts();
+            if (choice == 3) {
+                methods.editContact();
             }
             if(choice == 4) {
+                methods.printContacts(methods.searchContacts("What name do you want to find?"));
+
+            }
+            if(choice == 5) {
                 methods.deleteContact();
             }
-            if(choice ==5){
+            if(choice == 6){
                 methods.manyContacts();
             }
             methods.mainMenu();
