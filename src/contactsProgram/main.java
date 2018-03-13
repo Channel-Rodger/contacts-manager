@@ -9,7 +9,7 @@ public class main {
         Input ask = new Input();
 
         int choice = 0;
-        while (choice != 5) {
+        while (choice != 6) {
 
             if(choice == 1) {
                 methods.viewContacts();
@@ -22,6 +22,9 @@ public class main {
             }
             if(choice == 4) {
                 methods.deleteContact();
+            }
+            if(choice ==5){
+                methods.manyContacts();
             }
             methods.mainMenu();
             choice = (int) ask.getLong("Enter an option (1,2,3,4 or 5)");
