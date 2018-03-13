@@ -77,8 +77,14 @@ public class methods {
     public static String addValidName() {
         String name =ask.getString("Enter your name: (First Last)");
         while (checkName(name)){
-            System.out.println("Names can only contain letters");
             name = ask.getString("Enter your name: (First Last)");
+        }
+        for(String contact: slurp()){
+            String contactName = contact.substring(0,contact.indexOf(" #"));
+            if(name.toLowerCase().equals(contactName.toLowerCase())){
+                System.out.println("That name already exists; choose a different one");
+                return addValidName();
+            }
         }
         return name;
     }
@@ -86,7 +92,6 @@ public class methods {
     public static Long addValidNumber() {
         Long num = ask.getLong("Enter your phone number: ");
         while(checkNumber(num.toString())){
-            System.out.println("Phone number must be either 7 or 10 digits");
             num = ask.getLong("Enter your phone number: ");
         }
         return num;
@@ -116,8 +121,19 @@ public class methods {
         return results;
     }
 
+    public static String howManyEntries(String prompt){
+        String name = ask.getString(prompt);
+        List<String> deleteChecker = editSearch(name);
+        if (deleteChecker.size() > 1) {
+            printContacts(deleteChecker);
+            System.out.println("Too many names matched, ");
+            return howManyEntries(prompt);
+        }
+        return name;
+    }
+
     public static void deleteContact() {
-        String name = ask.getString("What name would you like to remove?");
+        String name = howManyEntries("Which name do you want to delete?: ");
         List<String> results = new ArrayList<>();
         for (String contact : slurp()) {
             if (!contact.contains(name)) {
@@ -125,6 +141,7 @@ public class methods {
             }
         }
         overwrite(results, false);
+        System.out.println("Delete successful!");
     }
 
     public static List<String> editSearch(String name) {
@@ -138,21 +155,12 @@ public class methods {
     }
 
     public static void editContact() {
-        String name = ask.getString("What name would you like to edit?");
-        List<String> results = editSearch(name);
-        if (results.size() > 1) {
-            printContacts(results);
-            System.out.println("Please specify which contact you would like to edit.");
-            editContact();
-            return;
-        }
+        String name = howManyEntries("What name would you like to edit");
         List<String> addressBook = new ArrayList<>();
         for (String contact : slurp()) {
             if (!contact.contains(name)) {
                 addressBook.add(contact);
             } else {
-
-                if (results.size() == 1) {
                     String oldName = contact.substring(0, contact.indexOf("#"));
                     String number = contact.substring(contact.indexOf("#") + 1);
                     editMenu();
@@ -170,12 +178,10 @@ public class methods {
                         Long num = addValidNumber();
                         addressBook.add(oldName + " #" + num);
                     }
-
-                }
-
-                    }
+             }
         }
         overwrite(addressBook, false);
+        System.out.println("Edit successful!");
     }
 
     public static void overwrite(List<String> list, boolean append) {
@@ -199,15 +205,7 @@ public class methods {
         for (int i = 0; i < peopleList.size(); i+=2){
             numberEdit = checkNumber(peopleList.get(i+1));
             nameEdit = checkName(peopleList.get(i));
-            if(numberEdit){
-                System.out.println("All phone numbers must be either 7 or 10 digits only");
-                System.out.println("Here are your entries, copy and paste it with the proper edits\n");
-                System.out.println(people+"\n");
-                manyContacts();
-                return;
-            }
-            if(nameEdit){
-                System.out.println("Names can only contain letters");
+            if(numberEdit || nameEdit){
                 System.out.println("Here are your entries, copy and paste it with the proper edits\n");
                 System.out.println(people+"\n");
                 manyContacts();
@@ -221,15 +219,28 @@ public class methods {
         if(userNum.trim().length()==7 || userNum.trim().length()==10){
             return false;
         }else {
+            System.out.println("All phone numbers must be either 7 or 10 digits only");
             return true;
         }
     }
     public static boolean checkName(String name){
         if(name.matches("(.*)[^A-Za-z\\s]+(.*)")){
+            System.out.println("Names can only contain letters");
             return true;
-        }else {
-            return false;
         }
+        List<String> duplicateNames = new ArrayList<>();
+        for(String contact: slurp()){
+            String contactName = contact.substring(0,contact.indexOf(" #"));
+            if(name.toLowerCase().equals(contactName.toLowerCase())){
+                duplicateNames.add(name);
+            }
+        }
+        if (duplicateNames.size() > 0 ){
+            System.out.println("Found duplicate name(s): " + duplicateNames);
+            System.out.println("Choose a different name");
+            return true;
+        }
+        return false;
     }
 
     public static void main(String[] args) {
