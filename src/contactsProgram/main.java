@@ -22,7 +22,6 @@ public class main {
             }
             if(choice == 4) {
                 methods.printContacts(methods.searchContacts("What name do you want to find?"));
-
             }
             if(choice == 5) {
                 methods.deleteContact();
