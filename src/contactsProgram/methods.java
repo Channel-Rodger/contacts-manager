@@ -202,21 +202,43 @@ public class methods {
         boolean nameEdit = false;
         List<String> peopleList = Arrays.asList(people.split(","));
         List<String> contacts = new ArrayList<>();
+        List<String> errorNames = new ArrayList<>();
+        List<String> errorNumbers = new ArrayList<>();
         for (int i = 0; i < peopleList.size(); i+=2){
-            numberEdit = checkNumber(peopleList.get(i+1));
             nameEdit = checkName(peopleList.get(i));
-            if(numberEdit || nameEdit){
-                System.out.println("Here are your entries, copy and paste it with the proper edits\n");
-                System.out.println(people+"\n");
-                manyContacts();
-                return;
+            numberEdit = checkNumber(peopleList.get(i+1), peopleList.get(i));
+            if(numberEdit){
+               errorNumbers.add(peopleList.get(i+1));
+            }
+            if(nameEdit){
+                errorNames.add(peopleList.get(i));
             }
             contacts.add(peopleList.get(i).trim().toLowerCase()+ " #"+ peopleList.get(i+1).trim());
+        }
+        if(errorNames.size() > 0 || errorNumbers.size() > 0){
+            System.out.println("Here are your entries, copy and paste it with the proper edits\n");
+            System.out.println(people+"\n");
+            manyContacts();
+            return;
         }
             overwrite(contacts, true);
     }
     public static boolean checkNumber(String userNum){
-        if(userNum.trim().length()==7 || userNum.trim().length()==10){
+        if(!userNum.trim().matches("(\\d+)")){
+            System.out.println("Only input integers for phone numbers");
+            return true;
+        }else if(userNum.trim().length()==7 || userNum.trim().length()==10){
+            return false;
+        }else {
+            System.out.println("All phone numbers must be either 7 or 10 digits only");
+            return true;
+        }
+    }
+    public static boolean checkNumber(String userNum, String userName){
+        if(!userNum.trim().matches("(\\d+)")){
+            System.out.println("Only input integers for phone number for: " + userName);
+            return true;
+        }else if(userNum.trim().length()==7 || userNum.trim().length()==10){
             return false;
         }else {
             System.out.println("All phone numbers must be either 7 or 10 digits only");
@@ -231,8 +253,8 @@ public class methods {
         List<String> duplicateNames = new ArrayList<>();
         for(String contact: slurp()){
             String contactName = contact.substring(0,contact.indexOf(" #"));
-            if(name.toLowerCase().equals(contactName.toLowerCase())){
-                duplicateNames.add(name);
+            if(name.toLowerCase().trim().equals(contactName.toLowerCase())){
+                duplicateNames.add(name.trim());
             }
         }
         if (duplicateNames.size() > 0 ){
